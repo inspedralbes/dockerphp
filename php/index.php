@@ -16,8 +16,8 @@
     ?>
     <h2>Variables</h2>
     <?php
-    $v1 = getenv('VAR1');
-    $v2 = getenv('VAR2');
+    $v1 = getenv('VAR1') ?: 'Ups, variable no definida';
+    $v2 = getenv('VAR2') ?: 'Ups, variable no definida';
     echo "<p>El valor de la variable d'entorn VAR1 és: <strong>$v1</strong> </p>";
     echo "<p>El valor de la variable d'entorn VAR2 és: <strong>$v2</strong></p>";
     ?>
