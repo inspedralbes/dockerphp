@@ -21,6 +21,7 @@
     echo "<p>El valor de la variable d'entorn VAR1 és: <strong>$v1</strong> </p>";
     echo "<p>El valor de la variable d'entorn VAR2 és: <strong>$v2</strong></p>";
     ?>
+    <p>Vols veure el <a href="llistat.php">llistat de cases</a>? </p>
     <p>Fi de la pàgina</p>
 </body>
 
