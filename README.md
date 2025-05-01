@@ -8,7 +8,7 @@ Esquema bàsic d'una aplicació PHP amb entorn de DEV amb docker
   - No és visible des de fora dels contenidors
   - El primer cop s'inicialitza amb una BBDD, i una taula amb algunes dades
 - El docker-compose.yml Mostra dues formes de definir variables d'entorn amb docker i php
-  - L'objectiu és que la cadena de connexió del php sigui dinàmica i no estigui escrita a sang (hardocded) a l'aplicació, per fer-ho heu d'utilitzar les variables d'entorn.
+  - L'objectiu és que la cadena de connexió del php sigui dinàmica i no estigui escrita en sang ([hardcoded](https://en.wikipedia.org/wiki/Hard_coding)) a l'aplicació, per fer-ho heu d'utilitzar les variables d'entorn.
 - El contenidor _web_ és una imatge construïda a mida i derivada de php:apache per incloure els drivers de mysqli de php
 - Hi ha un contenidor _adminer_ al port 8081 que permet gestionar la BBDD mysql
 
