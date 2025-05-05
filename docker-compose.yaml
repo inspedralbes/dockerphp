@@ -1,8 +1,9 @@
-# Hi ha 3 contenidors
+# Hi ha 5 contenidors
 # 1. php amb apache (la nostra aplicació web) que la trobaràs a http://localhost:8080
 # 2. mysql (la base de dades), que no és accessible des de l'exterior (el primer cop pot trigar diversos minuts, mireu els logs)
 # 3. adminer (un client web per gestionar el mysql), que la trobaràs a http://localhost:8081
-
+# 5, mongo BBDD no sql
+# 6, express js, servidor web per gestionar el mongo
 
 services:
   web:
@@ -10,7 +11,7 @@ services:
     #image: php:apache
     build:
       context: ./images
-      dockerfile: Dockerfile_php
+      dockerfile: Dockerfile_php_mongo
     ports:
       - "8080:80"
     volumes:
@@ -43,13 +44,34 @@ services:
       - ./db_data:/var/lib/mysql
       - ./db_init:/docker-entrypoint-initdb.d
 
-
-# Aquesta imatge és un client web per gestionar el mysql via web
-# està disponible a http://localhost:8081
-# i les credencials són les del mysql (per que "simplement" es connecta al mysql)
+  # Aquesta imatge és un client web per gestionar el mysql via web
+  # està disponible a http://localhost:8081
+  # i les credencials són les del mysql (per que "simplement" es connecta al mysql)
   adminer:
     image: adminer
     ports:
       - "8081:8080"
     depends_on:
       - db
+
+  # BBDD no sql,
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mico
+      MONGO_INITDB_ROOT_PASSWORD: filos
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8082:8081"
+    environment:
+      #Per entrar a la web de mongo-express, les credencials són
+      #admin
+      #pass
+      ME_CONFIG_MONGODB_URL: mongodb://mico:filos@mongo:27017/
+
+    depends_on:
+      - mongo
