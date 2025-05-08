@@ -7,21 +7,24 @@
 
 services:
   apache_php_mysql_mongodb:
-    #La imatge php:apache no conté els drivers de mysql, hem de fer una imatge a mida
+    #La imatge php:apache no té tots els drivers. hem de fer una imatge a mida
+    # Podeu fer servir el dockerfile que hi ha a /images i fer el build
+    # o podeu agafar aquest imatge, ebota/daw:apache_php_mysql_mongodb, 
+    #  que ja està construüida i està a dockerhub. Teniu més info a:
+    # https://hub.docker.com/r/ebota/daw
     image: ebota/daw:apache_php_mysql_mongodb
-    # build:
-    #   context: ./images
-    #   dockerfile: Dockerfile_php_mongo
     ports:
       - "8080:80"
     volumes:
       - ./php:/var/www/html
+    # És necessari que hi hagi el fitxer composer.json a la carpeta php i la següent directiva
+    # perque el php instal·li les dependències de mongo 
     command: /bin/bash -c "composer install --no-interaction --no-plugins --no-scripts && echo WEBSERVER_________UP_________AND_______RUNNIIIIIIING && apache2-foreground"
     environment:
       VAR1: "sóc una pera i estic al docker-compose"
       VAR2: ${VAR2}
-  #   depends_on:
-  #     - db
+    depends_on:
+       - db
 
   db:
     # Tota la informació d'aquesta imatge està https://dockerhub.com/_/mysql
@@ -39,7 +42,7 @@ services:
     #    L'aplicació web hi accedirà per la xarxa interna de docker
     #    ports:
     #      - "3306:3306"
-    # La carpeta de mysql ha d'estar al .gitignore per no pujar-la al repositori
+    # La carpeta de mysql /db_data ha d'estar al .gitignore per no pujar-la al repositori
     volumes:
       - ./db_data:/var/lib/mysql
       - ./db_init:/docker-entrypoint-initdb.d
@@ -58,7 +61,10 @@ services:
   mongo:
     image: mongo:latest
     volumes:
-      #Named volume
+      #Named volume, no cal posar res al .gitignore
+      #perque no es crea una carpeta al host sinó que es crea un volum a docker
+      # i es pot veure amb docker volume ls
+      # i es pot eliminar amb docker volume rm nom_del_volum      
       - mongodb_data:/data/db
     ports:
       - "27017:27017"

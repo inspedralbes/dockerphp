@@ -27,6 +27,7 @@
         <p><a href="index.php">Portada</a> </p>
         <p><a href="llistar.php">Llistar</a></p>
         <p><a href="crear.php">Crear</a></p>
+        <p><a href="mongo.php">Mongo</a></p>
     </div>
     <p>Fi de la pàgina</p>
 </body>
