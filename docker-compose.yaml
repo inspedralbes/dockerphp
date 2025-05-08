@@ -1,26 +1,27 @@
 # Hi ha 5 contenidors
-# 1. php amb apache (la nostra aplicació web) que la trobaràs a http://localhost:8080
+# 1. php amb apache i els drivers de mongodb (la nostra aplicació web) que la trobaràs a http://localhost:8080
 # 2. mysql (la base de dades), que no és accessible des de l'exterior (el primer cop pot trigar diversos minuts, mireu els logs)
-# 3. adminer (un client web per gestionar el mysql), que la trobaràs a http://localhost:8081
-# 5, mongo BBDD no sql
-# 6, express js, servidor web per gestionar el mongo
+# 3. adminer (un client web per gestionar el mysql), que el trobaràs a http://localhost:8081
+# 5, mongo la BBDD no sql
+# 6, express js, (un client web per gestionar el mongodv) que el trobaràs a http://localhost:8081
 
 services:
-  web:
+  apache_php_mysql_mongodb:
     #La imatge php:apache no conté els drivers de mysql, hem de fer una imatge a mida
-    #image: php:apache
-    build:
-      context: ./images
-      dockerfile: Dockerfile_php_mongo
+    image: ebota/daw:apache_php_mysql_mongodb
+    # build:
+    #   context: ./images
+    #   dockerfile: Dockerfile_php_mongo
     ports:
       - "8080:80"
     volumes:
       - ./php:/var/www/html
+    command: /bin/bash -c "composer install --no-interaction --no-plugins --no-scripts && echo WEBSERVER_________UP_________AND_______RUNNIIIIIIING && apache2-foreground"
     environment:
       VAR1: "sóc una pera i estic al docker-compose"
       VAR2: ${VAR2}
-    depends_on:
-      - db
+  #   depends_on:
+  #     - db
 
   db:
     # Tota la informació d'aquesta imatge està https://dockerhub.com/_/mysql
@@ -38,7 +39,6 @@ services:
     #    L'aplicació web hi accedirà per la xarxa interna de docker
     #    ports:
     #      - "3306:3306"
-
     # La carpeta de mysql ha d'estar al .gitignore per no pujar-la al repositori
     volumes:
       - ./db_data:/var/lib/mysql
@@ -56,12 +56,15 @@ services:
 
   # BBDD no sql,
   mongo:
-    image: mongo
+    image: mongo:latest
+    volumes:
+      #Named volume
+      - mongodb_data:/data/db
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: mico
-      MONGO_INITDB_ROOT_PASSWORD: filos
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
 
   mongo-express:
     image: mongo-express
@@ -71,7 +74,15 @@ services:
       #Per entrar a la web de mongo-express, les credencials són
       #admin
       #pass
-      ME_CONFIG_MONGODB_URL: mongodb://mico:filos@mongo:27017/
-
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
     depends_on:
       - mongo
+
+# Volums
+#Les dades del mongodb les guardem en un named volume
+#perque així no es perden quan es recrea el contenidor
+#Però el podem esborrar des del terminal amb:
+#docker volume ls #per veure els volums creats
+#docker volume rm nom_del_volum #per eliminar un volum
+volumes:
+  mongodb_data:

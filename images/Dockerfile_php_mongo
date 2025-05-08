@@ -1,31 +1,49 @@
-FROM php:apache
+FROM php:8.4-apache
 
-# Realment només necessitem això per mysql 
-#La gent de docker i php han preparat uns scripts que ens faciliten la feina
-# i ens permeten instal·lar extensions de php de manera senzilla
+#Instal·lem les extensions de PHP que necessitem
 RUN docker-php-ext-install pdo_mysql mysqli
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Exemple de com instal·lar altres paquets a la imatge
+# Instal·lem dependències
 RUN apt-get update && apt-get install -y \
-    unzip \
-    zip 
-
-RUN apt-get install -y \
-    git \
-    libssl-dev \
+    libcurl4-openssl-dev \
     pkg-config \
-    && pecl install mongodb \
-    && docker-php-ext-enable mongodb \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    libssl-dev \
+    unzip \
+    git\
+    apt-transport-https\
+    ca-certificates\
+    wget\
+    lsb-release \
+    gnupg2
 
-RUN echo "extension=mongodb.so" >> /usr/local/etc/php/php.ini
+RUN apt-get clean
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Instal·lem l'extensió MongoDB per PHP
+RUN pecl install mongodb \
+    && echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongodb.ini \
+    && docker-php-ext-enable mongodb
 
-WORKDIR /app
-COPY . /app
-RUN composer install || true
+
+# 2. (Opcional) comprovem que l’extensió s’ha carregat
+RUN php -m | grep mongodb
+
+# Instal·lem Composer
+COPY --from=composer/composer:2.8.8-bin /composer /usr/bin/composer
+
+# Configurem el directori de treball
+WORKDIR /var/www/html
+
+#### NO HO FEM PQ. després montem el volum i taparia la carpeta vendor que es crees
+### en aquest punt. Seria perdre el temps, perque després ho tornem a fer al docker-compose
+#Copiem composer.json per instal·lar les dependències
+#COPY composer.json .
+#RUN composer install --no-interaction --no-plugins --no-scripts
+
+# Permisos al directori web
+RUN chown -R www-data:www-data /var/www/html
+
+# Exposem el port 80
+EXPOSE 80
