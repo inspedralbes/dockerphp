@@ -22,10 +22,16 @@
   docker-compose up -d NOM_SERVEI
   ```
 
-- **Aturar i eliminar tots els serveis**:
+- **Aturar tots els serveis**:
   ```bash
   docker-compose down
   ```
+  
+- **Aturar tots els serveis i eliminar els volums **:
+  ```bash
+  docker-compose down -v
+  ```
+
 
 - **Aturar només un servei**:
   ```bash
